@@ -19,8 +19,9 @@ namespace CMVModBot.Bot
 
         public static void Main(string[] args)
         {
-            _serviceTimer = new Timer(ServiceTimerCallback, null, 0, 1000);
-            Console.ReadLine();
+            //_serviceTimer = new Timer(ServiceTimerCallback, null, 0, 1000);
+            //Console.ReadLine();
+            DoWork();
         }
 
         private static void ServiceTimerCallback(Object sender)

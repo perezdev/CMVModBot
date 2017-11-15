@@ -1,10 +1,4 @@
 ﻿using RedditSharp;
-using RedditSharp.Things;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CMVModBot.RedditApi
 {
@@ -20,14 +14,17 @@ namespace CMVModBot.RedditApi
         private string _secret;
         private string _redirectUri;
 
+        /// <summary>
+        /// Private reddit object so we don't expose it to other code. We want the RedditClient to handle all interactions with the reddit object. This is
+        /// so we can have a single place to manage authentication and what not
+        /// </summary>
         Reddit _reddit = null;
         private Reddit reddit
         {
             get
             {
                 //The reddit object is used in a bunch of different places. So it seemed best to just do the logic in the property
-                //so it will instantiate a new object any time it's null. This makes it simpler than calling a method to get the logic. And I don't want to expose the Reddit
-                //object because then the console will need a direct reference to RedditSharp.
+                //so it will instantiate a new object any time it's null. This makes it simpler than calling a method to get the logic.
                 if (_reddit == null)
                 {
                     var webAgent = new BotWebAgent(_userName, _password, _clientId, _secret, _redirectUri);
@@ -51,11 +48,17 @@ namespace CMVModBot.RedditApi
             _redirectUri = redirectUri;
         }
 
-        public string GetWikiPageText(string subredditShortct, string pageName)
+        /// <summary>
+        /// Gets the wiki page plain text by subreddit
+        /// </summary>
+        /// <param name="subredditShortcut">/r/subName</param>
+        /// <param name="pageName">Name of wiki page to pull</param>
+        /// <returns>Plain wiki page text</returns>
+        public string GetWikiPageText(string subredditShortcut, string pageName)
         {
             string text = string.Empty;
 
-            var sub = reddit.GetSubredditAsync(subredditShortct).GetAwaiter().GetResult();
+            var sub = reddit.GetSubredditAsync(subredditShortcut).GetAwaiter().GetResult();
             if (sub != null)
             {
                 var wiki = sub.GetWiki;
@@ -66,13 +69,18 @@ namespace CMVModBot.RedditApi
 
             return text;
         }
-        public void SaveWikiPageText(string subredditShortct, string pageName, string content)
+        /// <summary>
+        /// Saves text to a specific wiki page
+        /// </summary>
+        /// <param name="subredditShortcut">/r/subName</param>
+        /// <param name="pageName">Page to save text to</param>
+        /// <param name="content">Plain text of page contents</param>
+        public void SaveWikiPageText(string subredditShortcut, string pageName, string content)
         {
-            var sub = reddit.GetSubredditAsync(subredditShortct).GetAwaiter().GetResult();
+            var sub = reddit.GetSubredditAsync(subredditShortcut).GetAwaiter().GetResult();
             if (sub != null)
             {
                 var wiki = sub.GetWiki;
-                //var page = wiki.GetPageAsync(pageName).GetAwaiter().GetResult();
                 wiki.EditPageAsync(pageName, content).GetAwaiter().GetResult();
             }
         }
