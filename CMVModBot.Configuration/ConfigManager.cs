@@ -37,10 +37,55 @@ namespace CMVModBot.Configuration
             var wikiConfig = DeserializeJson(configJson);
             //Update new config object with the values from the wiki config
             config.Enabled = wikiConfig.Enabled;
-            config.WikiPageName = wikiConfig.WikiPageName; //I don't know if this is going to be a good thing.
+            //Gets the enabled sub action configs from the wiki
+            config.SubredditActionConfigs = GetSubredditActionConfigsFromWiki(wikiConfig);
 
             return config;
         }
+        /// <summary>
+        /// Gets the enabled configurations for the subreddit actions from the wiki config
+        /// </summary>
+        /// <param name="wikiConfig"></param>
+        /// <returns>List of enabled sub action configs</returns>
+        private static List<SubActionConfigBase> GetSubredditActionConfigsFromWiki(Config wikiConfig)
+        {
+            var subActionConfigs = new List<SubActionConfigBase>();
+
+            //We'll populate the subreddit action configs with defaults if none exist in the wiki
+            if (wikiConfig.SubredditActionConfigs.Count == 0)
+            {
+                //Fresh Topic Friday
+                var subActionConfig_FreeTopicFriday = new FreshTopicFridaySubActionConfig()
+                {
+                    Enabled = true,
+                    Name = "Fresh Topic Friday",
+                    FlairText = "Fresh Topic Friday",
+                    StartDayOfWeek = DayOfWeek.Friday,
+                    EndDayOfWeek = DayOfWeek.Saturday,
+                    StartUtcTime = new DateTime(1900, 1, 1, 6, 0, 0, DateTimeKind.Utc), //There's no time object in .NET. So I'm just using the DateTime and ignoring the year, month, and day
+                    EndUtcTime = new DateTime(1900, 1, 1, 6, 0, 0, DateTimeKind.Utc),
+                };
+
+                //SnooNotes
+
+                //BanDiscussions
+
+                //Rule E Violation
+
+                subActionConfigs.Add(subActionConfig_FreeTopicFriday);
+            }
+            else //Otherwise, we'll get the existing configs
+            {
+                foreach (SubActionConfigBase wikiActionConfig in wikiConfig.SubredditActionConfigs)
+                {
+                    if (wikiActionConfig.Enabled)
+                        subActionConfigs.Add(wikiActionConfig);
+                }
+            }
+
+            return subActionConfigs;
+        }
+
         /// <summary>
         /// Saves the config data to the wiki page. Not sure if I'm going to keep this method since the bot won't be updating it's own config info.
         /// </summary>

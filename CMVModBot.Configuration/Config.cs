@@ -22,5 +22,7 @@ namespace CMVModBot.Configuration
         [JsonIgnore]
         public string RedditApiRedirectUri { get; set; }
         public string WikiPageName { get; set; }
+
+        public List<SubActionConfigBase> SubredditActionConfigs { get; set; } = new List<SubActionConfigBase>();
     }
 }
