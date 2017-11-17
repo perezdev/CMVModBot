@@ -29,9 +29,9 @@ namespace CMVModBot.Configuration
             };
 
             //Instantiating the reddit client logs the bot into reddit. Every reddit api action will be called from the reddit client
-            var redditClient = new RedditClient(config.BotUsername, config.BotPassword, config.RedditApiClientId, config.RedditApiSecret, config.RedditApiSecret);
+            var redditClient = new RedditClient(config.BotUsername, config.BotPassword, config.RedditApiClientId, config.RedditApiSecret, config.RedditApiRedirectUri, config.SubredditShortcut);
             //The wiki page stores the confguration as JSON
-            var configJson = redditClient.GetWikiPageText(config.SubredditShortcut, config.WikiPageName);
+            var configJson = redditClient.GetWikiPageText(config.WikiPageName);
             //The sensitive config values like the bot password and API secret come from the app.config. Everything else is stored on
             //the wiki page so it can be updated when needed.
             var wikiConfig = DeserializeJson(configJson);
@@ -62,8 +62,8 @@ namespace CMVModBot.Configuration
                     FlairText = "Fresh Topic Friday",
                     StartDayOfWeek = DayOfWeek.Friday,
                     EndDayOfWeek = DayOfWeek.Saturday,
-                    StartUtcTime = new DateTime(1900, 1, 1, 6, 0, 0, DateTimeKind.Utc), //There's no time object in .NET. So I'm just using the DateTime and ignoring the year, month, and day
-                    EndUtcTime = new DateTime(1900, 1, 1, 6, 0, 0, DateTimeKind.Utc),
+                    StartUtcTime = new TimeSpan(0, 6, 0, 0, 0),
+                    EndUtcTime = new TimeSpan(0, 6, 0, 0, 0)
                 };
 
                 //SnooNotes
@@ -94,8 +94,8 @@ namespace CMVModBot.Configuration
         {
             string configJson = SerializeJson(config); //Convert config object to JSON string
 
-            var redditClient = new RedditClient(config.BotUsername, config.BotPassword, config.RedditApiClientId, config.RedditApiSecret, config.RedditApiSecret);
-            redditClient.SaveWikiPageText(config.SubredditShortcut, config.WikiPageName, configJson);
+            var redditClient = new RedditClient(config.BotUsername, config.BotPassword, config.RedditApiClientId, config.RedditApiSecret, config.RedditApiSecret, config.SubredditShortcut);
+            redditClient.SaveWikiPageText(config.WikiPageName, configJson);
         }
         /// <summary>
         /// Converts config object to a JSON string

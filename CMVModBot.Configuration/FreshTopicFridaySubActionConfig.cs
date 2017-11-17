@@ -7,7 +7,7 @@ namespace CMVModBot.Configuration
         public string FlairText { get; set; }
         public DayOfWeek StartDayOfWeek { get; set; }
         public DayOfWeek EndDayOfWeek { get; set; }
-        public DateTime StartUtcTime { get; set; }
-        public DateTime EndUtcTime { get; set; }
+        public TimeSpan StartUtcTime { get; set; }
+        public TimeSpan EndUtcTime { get; set; }
     }
 }

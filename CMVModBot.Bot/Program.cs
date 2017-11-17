@@ -1,4 +1,5 @@
-﻿using CMVModBot.Configuration;
+﻿using CMVModBot.Bot.SubredditActions;
+using CMVModBot.Configuration;
 using CMVModBot.RedditApi;
 using System;
 using System.Collections.Generic;
@@ -14,8 +15,8 @@ namespace CMVModBot.Bot
         private static Timer _serviceTimer { get; set; }
         private static bool IsWorking { get; set; } = false;
 
-        public static RedditClient _redditClient { get; set; }
-        public static Config _config { get; set; }
+        public static RedditClient redditClient { get; set; }
+        public static Config config { get; set; }
 
         public static void Main(string[] args)
         {
@@ -39,10 +40,22 @@ namespace CMVModBot.Bot
 
             try
             {
-                _config = ConfigManager.GetConfig(); //Config will be pulled fresh from the sub wiki on every iteration of work
-                _redditClient = new RedditClient(_config.BotUsername, _config.BotPassword, _config.RedditApiClientId, _config.RedditApiSecret, _config.RedditApiRedirectUri);
+                config = ConfigManager.GetConfig(); //Config will be pulled fresh from the sub wiki on every iteration of work
+                redditClient = new RedditClient(config.BotUsername, config.BotPassword, config.RedditApiClientId, config.RedditApiSecret, config.RedditApiRedirectUri, config.SubredditShortcut);
 
-                ConfigManager.SaveConfig(_config);
+                if (config.Enabled)
+                {
+                    //Configs won't be in the list if they aren't enabled from the wiki. So that's why I'm doing an Any LINQ check
+                    if (config.SubredditActionConfigs.Any(x => x.GetType() == typeof(FreshTopicFridaySubActionConfig)))
+                    {
+                        //Single linq check because there will only ever be one of each config. And if we're at this point, then the config exists.
+                        var actionConfig = config.SubredditActionConfigs.Single(x => x.GetType() == typeof(FreshTopicFridaySubActionConfig)) as FreshTopicFridaySubActionConfig;
+                        var action_FTF = new FreshTopicFridaySubredditAction(actionConfig, redditClient);
+                        action_FTF.PerformSubredditAction();
+                    }
+                }
+
+                //ConfigManager.SaveConfig(_config);
             }
             catch (Exception ex)
             {
