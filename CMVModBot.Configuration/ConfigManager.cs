@@ -55,24 +55,12 @@ namespace CMVModBot.Configuration
             if (wikiConfig.SubredditActionConfigs.Count == 0)
             {
                 //Fresh Topic Friday
-                var subActionConfig_FreeTopicFriday = new FreshTopicFridaySubActionConfig()
-                {
-                    Enabled = true,
-                    Name = "Fresh Topic Friday",
-                    FlairText = "Fresh Topic Friday",
-                    StartDayOfWeek = DayOfWeek.Friday,
-                    EndDayOfWeek = DayOfWeek.Saturday,
-                    StartUtcTime = new TimeSpan(0, 6, 0, 0, 0),
-                    EndUtcTime = new TimeSpan(0, 6, 0, 0, 0)
-                };
-
+                subActionConfigs.Add(GetDefaultFreshTopicFridaySubActionConfig());
                 //SnooNotes
 
-                //BanDiscussions
+                //Ban Discussions
 
-                //Rule E Violation
-
-                subActionConfigs.Add(subActionConfig_FreeTopicFriday);
+                //Rule E Violations
             }
             else //Otherwise, we'll get the existing configs
             {
@@ -121,5 +109,41 @@ namespace CMVModBot.Configuration
 
             return configuration;
         }
+
+        #region Action Configs
+
+        private static FreshTopicFridaySubActionConfig GetDefaultFreshTopicFridaySubActionConfig()
+        {
+            //I want to abstract this to a method. But not sure where to put it
+            var stickyPostBody = new StringBuilder();
+            stickyPostBody.AppendLine("Every Friday, posts are withheld for review by the moderators and approved if they aren't highly similar to another made in the past month.");
+            stickyPostBody.AppendLine();
+            stickyPostBody.AppendLine("This is to reduce topic fatigue for our regular contributors, without which the subreddit would be worse off.");
+            stickyPostBody.AppendLine();
+            stickyPostBody.AppendLine("[See here](https://www.reddit.com/r/changemyview/wiki/freshtopicfriday) for a full explanation of Fresh Topic Friday.");
+            stickyPostBody.AppendLine();
+            stickyPostBody.AppendLine("*Feel free to [message the moderators](https://www.reddit.com/message/compose?to=%2Fr%2Fchangemyview) if you have any questions or concerns.*");
+
+            var actionConfig = new FreshTopicFridaySubActionConfig()
+            {
+                Enabled = true,
+                Name = "Fresh Topic Friday",
+                FlairText = "Fresh Topic Friday",
+                StartDayOfWeek = DayOfWeek.Friday,
+                EndDayOfWeek = DayOfWeek.Saturday,
+                StartUtcTime = new TimeSpan(0, 6, 0, 0, 0),
+                EndUtcTime = new TimeSpan(0, 6, 0, 0, 0),
+                StickyPostSettings = new StickyPostSettings()
+                {
+                    Title = $"It's Fresh Topic Friday!", //When we make the actual post, this will be appending with the current date
+                    Body = stickyPostBody.ToString(),
+                    Flair = "Fresh Topic Friday"
+                }
+            };
+
+            return actionConfig;
+        }
+
+        #endregion
     }
 }

@@ -9,5 +9,6 @@ namespace CMVModBot.Configuration
         public DayOfWeek EndDayOfWeek { get; set; }
         public TimeSpan StartUtcTime { get; set; }
         public TimeSpan EndUtcTime { get; set; }
+        public StickyPostSettings StickyPostSettings { get; set; }
     }
 }

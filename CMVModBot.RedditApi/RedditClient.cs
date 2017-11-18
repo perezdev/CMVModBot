@@ -1,4 +1,5 @@
 ﻿using RedditSharp;
+using RedditSharp.Things;
 
 namespace CMVModBot.RedditApi
 {
@@ -114,10 +115,9 @@ namespace CMVModBot.RedditApi
             }
         }
         /// <summary>
-        /// 
+        /// Gets the currently set spam filter stregth (all, high, low) for text posts
         /// </summary>
-        /// <param name="subredditShortcut"></param>
-        /// <returns></returns>
+        /// <returns>SelfPostSpamFilterStrength</returns>
         public SelfPostSpamFilterStrength? GetSelfPostSpamFilterStrength()
         {
             SelfPostSpamFilterStrength? filterStrength = null;
@@ -141,6 +141,26 @@ namespace CMVModBot.RedditApi
             }
 
             return filterStrength;
+        }
+        /// <summary>
+        /// Submits a text post and stickies it
+        /// </summary>
+        /// <param name="title">Title of post</param>
+        /// <param name="text">Body of post</param>
+        /// <param name="flair">Flair of post</param>
+        public void SubmitStickyTextPost(string title, string text, string flair)
+        {
+            var sub = reddit.GetSubredditAsync(_subredditShortcut).GetAwaiter().GetResult();
+            if (sub != null)
+            {
+                //Submit post
+                Post post = sub.SubmitTextPostAsync(title, text).GetAwaiter().GetResult();
+                //Set flair after post is made
+                post.SubredditName = "CMVModBotTest"; //Subreddit name object is null and it prevents the flair from being set. Setting it manually is a doable work around
+                post.SetFlairAsync(flair, "").GetAwaiter().GetResult();
+                //Sticky post after post is made
+                post.StickyModeAsync(true).GetAwaiter().GetResult();
+            }
         }
     }
     public enum SelfPostSpamFilterStrength

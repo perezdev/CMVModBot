@@ -55,7 +55,7 @@ namespace CMVModBot.Bot
                     }
                 }
 
-                //ConfigManager.SaveConfig(_config);
+                //ConfigManager.SaveConfig(config);
             }
             catch (Exception ex)
             {
