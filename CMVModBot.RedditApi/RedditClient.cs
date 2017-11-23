@@ -162,6 +162,7 @@ namespace CMVModBot.RedditApi
                 post.SetFlairAsync(flair, "").GetAwaiter().GetResult();
                 //Sticky post after post is made
                 post.StickyModeAsync(true).GetAwaiter().GetResult();
+                post.DistinguishAsync(ModeratableThing.DistinguishType.Moderator).GetAwaiter().GetResult();
             }
         }
         /// <summary>
