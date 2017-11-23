@@ -10,5 +10,6 @@ namespace CMVModBot.Configuration
         public TimeSpan StartUtcTime { get; set; }
         public TimeSpan EndUtcTime { get; set; }
         public StickyPostSettings StickyPostSettings { get; set; }
+        public PrivateMessageSettings PrivateMessageSettings { get; set; }
     }
 }

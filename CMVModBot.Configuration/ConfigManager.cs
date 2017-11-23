@@ -11,6 +11,10 @@ namespace CMVModBot.Configuration
 {
     public static class ConfigManager
     {
+        //This is so we can use the sub shortcut while building the config. Otherwise, we'd have to wait until the config was completed. Which won't work,
+        //because some things require the sub shortcut like the PM info. This feels a bit hacky. But I'll address it later, if needed.
+        private static string _subShortcut { get; set; }
+
         /// <summary>
         /// Gets the config object from the app.config file (for sensitive data) and the specified Wiki page
         /// </summary>
@@ -28,17 +32,23 @@ namespace CMVModBot.Configuration
                 WikiPageName = ConfigurationManager.AppSettings["WikiPageName"]
             };
 
+            _subShortcut = config.SubredditShortcut;
+
             //Instantiating the reddit client logs the bot into reddit. Every reddit api action will be called from the reddit client
             var redditClient = new RedditClient(config.BotUsername, config.BotPassword, config.RedditApiClientId, config.RedditApiSecret, config.RedditApiRedirectUri, config.SubredditShortcut);
-            //The wiki page stores the confguration as JSON
+            //The wiki page stores the confguration as JSON. If the JSON is empty, we'll build the config from default values
             var configJson = redditClient.GetWikiPageText(config.WikiPageName);
             //The sensitive config values like the bot password and API secret come from the app.config. Everything else is stored on
             //the wiki page so it can be updated when needed.
             var wikiConfig = DeserializeJson(configJson);
             //Update new config object with the values from the wiki config
-            config.Enabled = wikiConfig.Enabled;
+            config.Enabled = wikiConfig == null ? true : wikiConfig.Enabled;
             //Gets the enabled sub action configs from the wiki
             config.SubredditActionConfigs = GetSubredditActionConfigsFromWiki(wikiConfig);
+
+            //If the wiki config is null, it means the JSON stored in the wiki has been deleted. This tells us to create a new default config.
+            if (wikiConfig == null)
+                SaveConfig(config);
 
             return config;
         }
@@ -52,7 +62,7 @@ namespace CMVModBot.Configuration
             var subActionConfigs = new List<SubActionConfigBase>();
 
             //We'll populate the subreddit action configs with defaults if none exist in the wiki
-            if (wikiConfig.SubredditActionConfigs.Count == 0)
+            if (wikiConfig == null || wikiConfig.SubredditActionConfigs.Count == 0)
             {
                 //Fresh Topic Friday
                 subActionConfigs.Add(GetDefaultFreshTopicFridaySubActionConfig());
@@ -75,7 +85,7 @@ namespace CMVModBot.Configuration
         }
 
         /// <summary>
-        /// Saves the config data to the wiki page. Not sure if I'm going to keep this method since the bot won't be updating it's own config info.
+        /// Saves the config data to the wiki page.
         /// </summary>
         /// <param name="config">Config object</param>
         public static void SaveConfig(Config config)
@@ -114,16 +124,6 @@ namespace CMVModBot.Configuration
 
         private static FreshTopicFridaySubActionConfig GetDefaultFreshTopicFridaySubActionConfig()
         {
-            //I want to abstract this to a method. But not sure where to put it
-            var stickyPostBody = new StringBuilder();
-            stickyPostBody.AppendLine("Every Friday, posts are withheld for review by the moderators and approved if they aren't highly similar to another made in the past month.");
-            stickyPostBody.AppendLine();
-            stickyPostBody.AppendLine("This is to reduce topic fatigue for our regular contributors, without which the subreddit would be worse off.");
-            stickyPostBody.AppendLine();
-            stickyPostBody.AppendLine("[See here](https://www.reddit.com/r/changemyview/wiki/freshtopicfriday) for a full explanation of Fresh Topic Friday.");
-            stickyPostBody.AppendLine();
-            stickyPostBody.AppendLine("*Feel free to [message the moderators](https://www.reddit.com/message/compose?to=%2Fr%2Fchangemyview) if you have any questions or concerns.*");
-
             var actionConfig = new FreshTopicFridaySubActionConfig()
             {
                 Enabled = true,
@@ -135,13 +135,47 @@ namespace CMVModBot.Configuration
                 EndUtcTime = new TimeSpan(0, 6, 0, 0, 0),
                 StickyPostSettings = new StickyPostSettings()
                 {
+                    Enabled = true,
                     Title = $"It's Fresh Topic Friday!", //When we make the actual post, this will be appending with the current date
-                    Body = stickyPostBody.ToString(),
+                    Body = GetFtfStickyPostBody(),
                     Flair = "Fresh Topic Friday"
+                },
+                PrivateMessageSettings = new PrivateMessageSettings()
+                {
+                    Enabled = true,
+                    ExcludeMods = true,
+                    Subject = "Fresh Topic Friday",
+                    Message = GetFtfPmMessage()
                 }
             };
 
             return actionConfig;
+        }
+        private static string GetFtfStickyPostBody()
+        {
+            var stickyPostBody = new StringBuilder();
+            stickyPostBody.AppendLine("Every Friday, posts are withheld for review by the moderators and approved if they aren't highly similar to another made in the past month.");
+            stickyPostBody.AppendLine();
+            stickyPostBody.AppendLine("This is to reduce topic fatigue for our regular contributors, without which the subreddit would be worse off.");
+            stickyPostBody.AppendLine();
+            stickyPostBody.AppendLine("[See here](https://www.reddit.com/r/changemyview/wiki/freshtopicfriday) for a full explanation of Fresh Topic Friday.");
+            stickyPostBody.AppendLine();
+            stickyPostBody.AppendLine("*Feel free to [message the moderators](https://www.reddit.com/message/compose?to=%2Fr%2Fchangemyview) if you have any questions or concerns.*");
+
+            return stickyPostBody.ToString();
+        }
+        private static string GetFtfPmMessage()
+        {
+            var message = new StringBuilder();
+            message.AppendLine("Hello!");
+            message.AppendLine();
+            message.AppendLine("It's currently Fresh Topic Friday at r/changemyview, which means your post is awaiting review by the moderators. You won't receive any responses in the meantime, but a decision should be made shortly. If the topic is deemed too popular for FTF, you'll have to post another day of the week.");
+            message.AppendLine();
+            message.AppendLine($"For more information on FTF, please see the [stickied post]({_subShortcut}/about/sticky?num=1).");
+            message.AppendLine();
+            message.AppendLine("*I am a bot, and this action was performed automatically. If you have any questions or concerns, please [contact the moderators directly.](https://www.reddit.com/message/compose?to=%2Fr%2Fchangemyview)*");
+
+            return message.ToString();
         }
 
         #endregion

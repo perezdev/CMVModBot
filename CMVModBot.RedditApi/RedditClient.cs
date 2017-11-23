@@ -1,5 +1,7 @@
 ﻿using RedditSharp;
 using RedditSharp.Things;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace CMVModBot.RedditApi
 {
@@ -30,7 +32,7 @@ namespace CMVModBot.RedditApi
                 if (_reddit == null)
                 {
                     var webAgent = new BotWebAgent(_userName, _password, _clientId, _secret, _redirectUri);
-                    _reddit = new Reddit(webAgent, false);
+                    _reddit = new Reddit(webAgent, true);
                 }
 
                 return _reddit;
@@ -110,8 +112,8 @@ namespace CMVModBot.RedditApi
                         settings.SpamFilter.SelfPostStrength = SpamFilterStrength.All;
                         break;
                 }
-                
-                settings.UpdateSettings();
+
+                settings.UpdateSettings().GetAwaiter().GetResult();
             }
         }
         /// <summary>
@@ -156,11 +158,85 @@ namespace CMVModBot.RedditApi
                 //Submit post
                 Post post = sub.SubmitTextPostAsync(title, text).GetAwaiter().GetResult();
                 //Set flair after post is made
-                post.SubredditName = "CMVModBotTest"; //Subreddit name object is null and it prevents the flair from being set. Setting it manually is a doable work around
+                post.SubredditName = _subredditShortcut.Replace("/r/", ""); //Subreddit name object is null and it prevents the flair from being set. Setting it manually is a doable work around
                 post.SetFlairAsync(flair, "").GetAwaiter().GetResult();
                 //Sticky post after post is made
                 post.StickyModeAsync(true).GetAwaiter().GetResult();
             }
+        }
+        /// <summary>
+        /// Gets the latest posts made by the bot. Posts are order by descending created UTC date.
+        /// </summary>
+        /// <param name="limit">Max number of posts to return.</param>
+        /// <returns>List of reddit posts</returns>
+        public List<RedditPost> GetLastStickedPosts(int limit = 5)
+        {
+            var posts = new List<RedditPost>();
+
+            reddit.User.GetPosts(Sort.New, limit, FromTime.All).Take(limit).ForEachAsync(post =>
+            {
+                if (post.IsStickied) //For this method, we only care about the posts that are stickied.
+                {
+                    posts.Add(new RedditPost(post));
+                }
+            }).GetAwaiter().GetResult();
+
+            return posts.OrderByDescending(x => x.CreatedUtc).ToList();
+        }
+        /// <summary>
+        /// Gets a specified number of posts from the new queue
+        /// </summary>
+        /// <param name="limit">Number of posts to retrieve</param>
+        /// <returns>List of RedditPost</returns>
+        public List<RedditPost> GetRedditPostsFromNewQueue(int limit = 100)
+        {
+            var posts = new List<RedditPost>();
+
+            var sub = reddit.GetSubredditAsync(_subredditShortcut).GetAwaiter().GetResult();
+            if (sub != null)
+            {
+                sub.GetPosts(Subreddit.Sort.New, limit).Take(limit).ForEachAsync(post =>
+                {
+                    posts.Add(new RedditPost(post));
+                }).GetAwaiter().GetResult();
+            }
+            
+            return posts;
+        }
+        /// <summary>
+        /// Sends a private message
+        /// </summary>
+        /// <param name="subject">Subject</param>
+        /// <param name="body">Text</param>
+        /// <param name="to">Reddit user name</param>
+        public void SendPrivateMessage(string subject, string body, string to)
+        {
+            _reddit.ComposePrivateMessageAsync(subject, body, to).GetAwaiter().GetResult();
+        }
+        /// <summary>
+        /// Gets the bot's user name from the internal reddit object
+        /// </summary>
+        /// <returns></returns>
+        public string GetBotUserName()
+        {
+            return _reddit.User.Name;
+        }
+        /// <summary>
+        /// Gets a list of moderators
+        /// </summary>
+        /// <returns></returns>
+        public List<string> GetModerators()
+        {
+            var mods = new List<string>();
+
+            var sub = reddit.GetSubredditAsync(_subredditShortcut).GetAwaiter().GetResult();
+            if (sub != null)
+            {
+                foreach(var mod in sub.GetModeratorsAsync().GetAwaiter().GetResult())
+                    mods.Add(mod.Name);
+            }
+
+            return mods;
         }
     }
     public enum SelfPostSpamFilterStrength
