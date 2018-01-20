@@ -66,11 +66,12 @@ namespace CMVModBot.Configuration
             {
                 //Fresh Topic Friday
                 subActionConfigs.Add(GetDefaultFreshTopicFridaySubActionConfig());
-                //SnooNotes
+
+                //Rule E Violations
+                subActionConfigs.Add(GetDefaultRuleERemovalSubActionConfig());
 
                 //Ban Discussions
 
-                //Rule E Violations
             }
             else //Otherwise, we'll get the existing configs
             {
@@ -122,6 +123,20 @@ namespace CMVModBot.Configuration
 
         #region Action Configs
 
+        private static RuleERemovalSubActionConfig GetDefaultRuleERemovalSubActionConfig()
+        {
+            var actionConfig = new RuleERemovalSubActionConfig()
+            {
+                AddSnooNotes = true,
+                Enabled = true,
+                Name = "Rule E Removal",
+                NumberOfTopLevelCommentsToCheck = 3,
+                TimeLimitToRemovePost = new TimeSpan(3, 0, 0),
+                RemovalMessage = GetRuleERemovalMessage()
+            };
+
+            return actionConfig;
+        }
         private static FreshTopicFridaySubActionConfig GetDefaultFreshTopicFridaySubActionConfig()
         {
             var actionConfig = new FreshTopicFridaySubActionConfig()
@@ -174,6 +189,18 @@ namespace CMVModBot.Configuration
             message.AppendLine($"For more information on FTF, please see the [stickied post]({_subShortcut}/about/sticky?num=1).");
             message.AppendLine();
             message.AppendLine("*I am a bot, and this action was performed automatically. If you have any questions or concerns, please [contact the moderators directly.](https://www.reddit.com/message/compose?to=%2Fr%2Fchangemyview)*");
+
+            return message.ToString();
+        }
+        private static string GetRuleERemovalMessage()
+        {
+            var message = new StringBuilder();
+            message.AppendLine("Sorry, <username> - your submission has been remove for breaking rule E:");
+            message.AppendLine();
+            message.AppendLine(">Only post if you are willing to have a conversation with those who reply to you, and are available to start doing so within 3 hours of posting. ");
+            message.Append("If you haven't replied within this time, your post will be removed. [See the wiki for more information](http://www.reddit.com/r/changemyview/wiki/rules#wiki_rule_e).");
+            message.AppendLine();
+            message.AppendLine("If you would like to appeal, please respond substantially to some of the arguments people have made, and then message the [moderators by clicking this link](http://google.com).");
 
             return message.ToString();
         }

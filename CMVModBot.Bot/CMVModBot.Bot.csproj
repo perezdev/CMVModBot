@@ -60,6 +60,7 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SubredditActions\FreshTopicFridaySubredditAction.cs" />
+    <Compile Include="SubredditActions\RuleERemovalSubredditAction.cs" />
     <Compile Include="SubredditActions\SubredditActionBase.cs" />
   </ItemGroup>
   <ItemGroup>

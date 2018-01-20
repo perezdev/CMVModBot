@@ -49,6 +49,7 @@
     <Compile Include="FreshTopicFridaySubActionConfig.cs" />
     <Compile Include="PrivateMessageSettings.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RuleERemovalSubActionConfig.cs" />
     <Compile Include="StickyPostSettings.cs" />
     <Compile Include="SubActionConfigBase.cs" />
   </ItemGroup>

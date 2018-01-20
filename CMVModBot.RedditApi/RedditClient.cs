@@ -170,7 +170,7 @@ namespace CMVModBot.RedditApi
         /// </summary>
         /// <param name="limit">Max number of posts to return.</param>
         /// <returns>List of reddit posts</returns>
-        public List<RedditPost> GetLastStickedPosts(int limit = 5)
+        public List<RedditPost> GetLastStickedPosts(int limit = 50)
         {
             var posts = new List<RedditPost>();
 
@@ -212,7 +212,7 @@ namespace CMVModBot.RedditApi
         /// <param name="to">Reddit user name</param>
         public void SendPrivateMessage(string subject, string body, string to)
         {
-            _reddit.ComposePrivateMessageAsync(subject, body, to).GetAwaiter().GetResult();
+            reddit.ComposePrivateMessageAsync(subject, body, to).GetAwaiter().GetResult();
         }
         /// <summary>
         /// Gets the bot's user name from the internal reddit object
@@ -220,7 +220,7 @@ namespace CMVModBot.RedditApi
         /// <returns></returns>
         public string GetBotUserName()
         {
-            return _reddit.User.Name;
+            return reddit.User.Name;
         }
         /// <summary>
         /// Gets a list of moderators
@@ -245,5 +245,14 @@ namespace CMVModBot.RedditApi
         Low,
         High,
         All
+    }
+    public enum CommentThingSort
+    {
+        Best,
+        Top,
+        New,
+        Controversial,
+        Old,
+        Qa
     }
 }

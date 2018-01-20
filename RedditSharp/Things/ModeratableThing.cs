@@ -99,6 +99,10 @@ namespace RedditSharp.Things
         [JsonProperty("approved")]
         public bool? IsApproved { get; private set; }
 
+        [JsonProperty("approved_at_utc")]
+        [JsonConverter(typeof(UnixTimestampConverter))]
+        public DateTime? ApprovedAtUtc { get; set; }
+
         /// <summary>
         /// Returns true if this item has been removed.
         /// Returns false if the item has not been removed.  A value of false does not indicate
@@ -174,9 +178,8 @@ namespace RedditSharp.Things
         /// Distinguishes (or undistinguishes) an item
         /// </summary>
         /// <param name="distinguishType">Type you want to distinguish <see cref="DistinguishType"/></param>
-        public async Task DistinguishAsync(DistinguishType distinguishType)
+        public async Task DistinguishAsync(DistinguishType distinguishType, bool sticky = false)
         {
-
             string how;
             switch (distinguishType)
             {
@@ -196,7 +199,8 @@ namespace RedditSharp.Things
             var json = await WebAgent.Post(DistinguishUrl, new
             {
                 how,
-                id = Id
+                id = FullName,
+                sticky = sticky
             }).ConfigureAwait(false);
             if (json["jquery"].Count(i => i[0].Value<int>() == 11 && i[1].Value<int>() == 12) == 0)
                 throw new Exception("You are not permitted to distinguish this comment.");

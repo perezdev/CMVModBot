@@ -28,11 +28,11 @@ namespace RedditSharp.Things
         private const string ContestModeUrl = "/api/set_contest_mode";
         private const string StickyModeUrl = "/api/set_subreddit_sticky";
 
-        #pragma warning disable 1591
+#pragma warning disable 1591
         public Post(IWebAgent agent, JToken json) : base(agent, json)
         {
         }
-        #pragma warning restore 1591
+#pragma warning restore 1591
 
         /// <summary>
         /// Domain of this post.
@@ -107,7 +107,7 @@ namespace RedditSharp.Things
         /// </summary>
         [JsonProperty("subreddit")]
         public string SubredditName { get; set; }
-        
+
 
         /// <summary>
         /// Prefix for fullname. Includes trailing underscore
@@ -143,14 +143,14 @@ namespace RedditSharp.Things
                 thing_id = FullName,
                 api_type = "json"
             }).ConfigureAwait(false);
-            if (json["json"]["ratelimit"] != null)
+            if (json["data"]["ratelimit"] != null)
                 throw new RateLimitException(TimeSpan.FromSeconds(json["json"]["ratelimit"].ValueOrDefault<double>()));
-            return new Comment(WebAgent, json["json"]["data"]["things"][0], this);
+            return new Comment(WebAgent, json["data"]["things"][0], this);
         }
 
         private async Task<JToken> SimpleActionToggleAsync(string endpoint, bool value, bool requiresModAction = false)
         {
-             return await WebAgent.Post(endpoint, new
+            return await WebAgent.Post(endpoint, new
             {
                 id = FullName,
                 state = value
@@ -213,7 +213,7 @@ namespace RedditSharp.Things
         /// <summary>
         /// Updates data retrieved for this post.
         /// </summary>
-        public async Task UpdateAsync() => Helpers.PopulateObject(GetJsonData(await Helpers.GetTokenAsync(WebAgent,Url)), this);
+        public async Task UpdateAsync() => Helpers.PopulateObject(GetJsonData(await Helpers.GetTokenAsync(WebAgent, Url)), this);
 
         /// <summary>
         /// Sets your flair
@@ -232,14 +232,19 @@ namespace RedditSharp.Things
         /// </summary>
         /// <param name="limit">Maximum number of comments to return</param>
         /// <returns></returns>
-        public async Task<List<Comment>> GetCommentsAsync(int limit = 0)
+        public async Task<List<Comment>> GetCommentsAsync(int limit = 0, CommentSort sort = CommentSort.Best)
         {
             var url = string.Format(GetCommentsUrl, Id);
+
+            //Only 'best' comment sorting isn't named the same
+            if (sort == CommentSort.Best)
+                url = $"{url}?sort=confidence";
+            else
+                url = $"{url}?sort={sort.ToString().ToLower()}";
+
             if (limit > 0)
-            {
-                var query = "limit=" + limit;
-                url = string.Format("{0}?{1}", url, query);
-            }
+                url = $"{url}&limit={limit}";
+
             var json = await WebAgent.Get(url).ConfigureAwait(false);
             var postJson = json.Last()["data"]["children"];
 
@@ -259,14 +264,19 @@ namespace RedditSharp.Things
         /// </summary>
         /// <param name="limit">Maximum number of comments to return. Returned list may be larger than this number though due to <see cref="More"/></param>
         /// <returns></returns>
-        public async Task<List<Thing>> GetCommentsWithMoresAsync(int limit = 0)
+        public async Task<List<Thing>> GetCommentsWithMoresAsync(int limit = 0, CommentSort sort = CommentSort.Best)
         {
             var url = string.Format(GetCommentsUrl, Id);
+
+            //Only 'best' comment sorting isn't named the same
+            if (sort == CommentSort.Best)
+                url = $"{url}?sort=confidence";
+            else
+                url = $"{url}?sort={sort.ToString().ToLower()}";
+
             if (limit > 0)
-            {
-                var query = "limit=" + limit;
-                url = string.Format("{0}?{1}", url, query);
-            }
+                url = $"{url}&limit={limit}";
+
             var json = await WebAgent.Get(url).ConfigureAwait(false);
             var postJson = json.Last()["data"]["children"];
 
@@ -275,13 +285,9 @@ namespace RedditSharp.Things
             {
                 Comment newComment = new Comment(WebAgent, comment, this);
                 if (newComment.Kind != "more")
-                {
                     things.Add(newComment);
-                }
-                else 
-                {
+                else
                     things.Add(new More(WebAgent, comment));
-                }
             }
 
             return things;
@@ -307,16 +313,18 @@ namespace RedditSharp.Things
         /// <param name="flairText">Text of flair to set</param>
         /// <param name="flairClass">Css class name of flair to set</param>
         /// <returns></returns>
-        public static Task SetFlairAsync(IWebAgent agent, string subreddit, string fullname, string flairText, string flairClass ) {
+        public static Task SetFlairAsync(IWebAgent agent, string subreddit, string fullname, string flairText, string flairClass)
+        {
             //TODO unit test
-            return agent.Post(string.Format(SetFlairUrl,subreddit) , new {
+            return agent.Post(string.Format(SetFlairUrl, subreddit), new
+            {
                 api_type = "json",
                 css_class = flairClass,
                 link = fullname,
                 text = flairText
             });
         }
-#endregion
+        #endregion
     }
 
 }

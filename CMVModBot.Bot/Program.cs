@@ -2,11 +2,7 @@
 using CMVModBot.Configuration;
 using CMVModBot.RedditApi;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace CMVModBot.Bot
 {
@@ -45,17 +41,14 @@ namespace CMVModBot.Bot
 
                 if (config.Enabled)
                 {
-                    //Configs won't be in the list if they aren't enabled from the wiki. So that's why I'm doing an Any LINQ check
-                    if (config.SubredditActionConfigs.Any(x => x.GetType() == typeof(FreshTopicFridaySubActionConfig)))
+                    foreach (var actionConfig in config.SubredditActionConfigs)
                     {
-                        //Single linq check because there will only ever be one of each config. And if we're at this point, then the config exists.
-                        var actionConfig = config.SubredditActionConfigs.Single(x => x.GetType() == typeof(FreshTopicFridaySubActionConfig)) as FreshTopicFridaySubActionConfig;
-                        var action_FTF = new FreshTopicFridaySubredditAction(actionConfig, redditClient);
-                        action_FTF.PerformSubredditAction();
+                        if (actionConfig.GetType() == typeof(FreshTopicFridaySubActionConfig))
+                            new FreshTopicFridaySubredditAction(actionConfig as FreshTopicFridaySubActionConfig, redditClient).PerformSubredditAction();
+                        else if (actionConfig.GetType() == typeof(RuleERemovalSubActionConfig))
+                            new RuleERemovalSubredditAction(actionConfig as RuleERemovalSubActionConfig, redditClient).PerformSubredditAction();
                     }
                 }
-
-                //ConfigManager.SaveConfig(config);
             }
             catch (Exception ex)
             {

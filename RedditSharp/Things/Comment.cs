@@ -18,7 +18,17 @@ namespace RedditSharp.Things
         private const string EditUserTextUrl = "/api/editusertext";
         private const string SetAsReadUrl = "/api/read_message";
 
-        #pragma warning disable 1591
+        public enum Sort
+        {
+            Best,
+            Top,
+            New,
+            Controversial,
+            Old,
+            Qa
+        }
+
+#pragma warning disable 1591
         public Comment(IWebAgent agent, JToken json, Thing sender) : base(agent, json) {
             var data = json["data"];
             Parent = sender;
