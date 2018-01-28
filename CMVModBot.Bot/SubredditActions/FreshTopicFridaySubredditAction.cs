@@ -30,8 +30,8 @@ namespace CMVModBot.Bot.SubredditActions
             var timeofDay = DateTime.UtcNow.TimeOfDay;
 
             //Just for testing. Will be removed eventually
-            dayOfWeek = DayOfWeek.Friday;
-            timeofDay = new TimeSpan(6, 0, 1);
+            //dayOfWeek = DayOfWeek.Saturday;
+            //timeofDay = new TimeSpan(07, 0, 1);
 
             //FTF begins on Friday at 06:00 AM UTC. The logic will run if it's Friday or if it's Saturday, but hasn't hit the expiration time
             if ((dayOfWeek == DayOfWeek.Friday && timeofDay >= _actionConfig.StartUtcTime) || (dayOfWeek == DayOfWeek.Saturday && timeofDay < _actionConfig.EndUtcTime))
@@ -47,9 +47,10 @@ namespace CMVModBot.Bot.SubredditActions
             //FTF ends Saturday at 06:00 AM UTC
             if (dayOfWeek == DayOfWeek.Saturday)
             {
-                //This will check if the current time between the end time and the end time plus 10 minutes. This plus 10 minute check is to make sure the bot can still switch off FTF
-                //if other tasks are taking a long time to process
-                if (timeofDay >= _actionConfig.EndUtcTime || timeofDay <= _actionConfig.EndUtcTime.Add(new TimeSpan(0, 10, 0)))
+                //This will check if the current time between the end time and the end time plus 1 hour. This extra one hour is to make sure the bot can still switch off FTF
+                //if other tasks are taking a long time to process. We also don't want the bot pulling data for the unsticky when not needed and setting the spam filering to low
+                //when it's not needed. We could accidentally override a mod's actions
+                if (timeofDay >= _actionConfig.EndUtcTime || timeofDay <= _actionConfig.EndUtcTime.Add(new TimeSpan(1, 0, 0)))
                 {
                     //Set spam filtering back to low after FTF is over
                     SetSpamFiltering(SelfPostSpamFilterStrength.Low);
