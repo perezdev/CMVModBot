@@ -58,6 +58,7 @@
     <Compile Include="RedditClient.cs" />
     <Compile Include="RedditComment.cs" />
     <Compile Include="RedditPost.cs" />
+    <Compile Include="RedditSub.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

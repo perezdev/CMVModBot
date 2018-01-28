@@ -44,7 +44,8 @@ namespace CMVModBot.Bot.SubredditActions
 
                     if (hoursLapsed >= limit.TotalHours)
                     {
-                        var comments = post.GetCommentsWithMore(100, CommentThingSort.New);
+                        //QA comments sorts comments by OP response first. This is a reliable way of checking if OP responded than potentially pulling thousands of comments
+                        var comments = post.GetCommentsWithMore(10, CommentThingSort.Qa); 
                         if (comments.Count >= commentsToCheck)
                         {
                             var hasOpReplied = HasOpRepliedToAnswers(comments, post.UserName);

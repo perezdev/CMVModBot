@@ -67,6 +67,8 @@
     <None Include="App.config" />
     <None Include="AppTemplate.config" />
     <None Include="packages.config" />
+    <None Include="Properties\PublishProfiles\cmvmodbot - FTP.pubxml" />
+    <None Include="Properties\PublishProfiles\cmvmodbot - Web Deploy.pubxml" />
     <None Include="Properties\PublishProfiles\CMVModBotBot20171114060310 - Web Deploy.pubxml" />
     <None Include="Properties\webjob-publish-settings.json" />
   </ItemGroup>
