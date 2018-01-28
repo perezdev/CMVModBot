@@ -16,18 +16,7 @@ namespace CMVModBot.Bot
 
         public static void Main(string[] args)
         {
-            //_serviceTimer = new Timer(ServiceTimerCallback, null, 0, 1000);
-            //Console.ReadLine();
             DoWork();
-        }
-
-        private static void ServiceTimerCallback(Object sender)
-        {
-            //The bot will continously run every second. But won't do any work until the previous work has completed.
-            if (!IsWorking)
-            {
-                DoWork();
-            }
         }
 
         private static void DoWork()

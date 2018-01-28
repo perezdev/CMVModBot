@@ -30,8 +30,8 @@ namespace CMVModBot.Bot.SubredditActions
             var timeofDay = DateTime.UtcNow.TimeOfDay;
 
             //Just for testing. Will be removed eventually
-            //dayOfWeek = DayOfWeek.Saturday;
-            //timeofDay = new TimeSpan(6, 0, 1);
+            dayOfWeek = DayOfWeek.Friday;
+            timeofDay = new TimeSpan(6, 0, 1);
 
             //FTF begins on Friday at 06:00 AM UTC. The logic will run if it's Friday or if it's Saturday, but hasn't hit the expiration time
             if ((dayOfWeek == DayOfWeek.Friday && timeofDay >= _actionConfig.StartUtcTime) || (dayOfWeek == DayOfWeek.Saturday && timeofDay < _actionConfig.EndUtcTime))
