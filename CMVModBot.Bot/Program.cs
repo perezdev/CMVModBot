@@ -21,8 +21,6 @@ namespace CMVModBot.Bot
 
         private static void DoWork()
         {
-            IsWorking = true;
-
             try
             {
                 config = ConfigManager.GetConfig(); //Config will be pulled fresh from the sub wiki on every iteration of work
@@ -43,8 +41,6 @@ namespace CMVModBot.Bot
             {
                 string error = ex.Message;
             }
-
-            IsWorking = false;
         }
     }
 }

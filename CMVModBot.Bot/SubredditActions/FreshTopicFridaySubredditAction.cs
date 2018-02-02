@@ -87,10 +87,19 @@ namespace CMVModBot.Bot.SubredditActions
         /// </summary>
         private void PmUsersOnNewPosts()
         {
+            
             //We'll grab all of the posts from the new queue that don't have a flair already. This is so we can set the flair and PM the individual.
             var posts = _redditClient.GetRedditPostsFromNewQueue().Where(x => x.LinkFlairText != _actionConfig.StickyPostSettings.Flair).ToList();
             foreach (var post in posts)
             {
+                var postDate = post.ApprovedAtUtc != null ? (DateTime)post.ApprovedAtUtc : post.CreatedUtc; //Use the approved at time when available because a post might be removed due to automod
+                var todaysDate = DateTime.UtcNow.Date;
+
+                //FTF will pull all new posts. There's a small chance that one of the new posts could be on Thursday if it was submitted late and there weren't a lot of posts made during that
+                //thursday/friday window. So we want to compare the post creation date to "today's date." In general, "today's date" should always be Friday because that's when FTF runs.
+                if (postDate.Date != todaysDate)
+                    continue;
+
                 if (post.UserName != _redditClient.GetBotUserName()) //Don't want the bot PMing itself
                 {
                     //All of these bools and checks could be replaced by a single statements. But I wanted to make this as readable as possible and this
