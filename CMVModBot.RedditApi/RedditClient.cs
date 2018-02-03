@@ -170,17 +170,22 @@ namespace CMVModBot.RedditApi
         /// </summary>
         /// <param name="limit">Max number of posts to return.</param>
         /// <returns>List of reddit posts</returns>
-        public List<RedditPost> GetLastStickedPosts(int limit = 50)
+        public List<RedditPost> GetLastStickedPosts(int limit = 10)
         {
             var posts = new List<RedditPost>();
 
-            reddit.User.GetPosts(Sort.New, limit, FromTime.All).Take(limit).ForEachAsync(post =>
+            //Stickied posts are at the top of the Hot listing.
+            var sub = reddit.GetSubredditAsync(_subredditShortcut).GetAwaiter().GetResult();
+            if (sub != null)
             {
-                if (post.IsStickied) //For this method, we only care about the posts that are stickied.
+                sub.GetPosts(Subreddit.Sort.Hot, limit).Take(limit).ForEachAsync(post =>
                 {
-                    posts.Add(new RedditPost(post));
-                }
-            }).GetAwaiter().GetResult();
+                    if (post.IsStickied)
+                    {
+                        posts.Add(new RedditPost(post));
+                    }
+                }).GetAwaiter().GetResult();
+            }
 
             return posts.OrderByDescending(x => x.CreatedUtc).ToList();
         }
