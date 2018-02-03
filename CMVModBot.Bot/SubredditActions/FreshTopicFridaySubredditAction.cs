@@ -50,7 +50,7 @@ namespace CMVModBot.Bot.SubredditActions
                 //This will check if the current time between the end time and the end time plus 1 hour. This extra one hour is to make sure the bot can still switch off FTF
                 //if other tasks are taking a long time to process. We also don't want the bot pulling data for the unsticky when not needed and setting the spam filering to low
                 //when it's not needed. We could accidentally override a mod's actions
-                if (timeofDay >= _actionConfig.EndUtcTime || timeofDay <= _actionConfig.EndUtcTime.Add(new TimeSpan(1, 0, 0)))
+                if (timeofDay >= _actionConfig.EndUtcTime || timeofDay >= _actionConfig.EndUtcTime.Add(new TimeSpan(1, 0, 0)))
                 {
                     //Set spam filtering back to low after FTF is over
                     SetSpamFiltering(SelfPostSpamFilterStrength.Low);
