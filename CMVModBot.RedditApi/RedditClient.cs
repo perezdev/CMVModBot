@@ -1,5 +1,6 @@
 ﻿using RedditSharp;
 using RedditSharp.Things;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -209,6 +210,19 @@ namespace CMVModBot.RedditApi
             
             return posts;
         }
+
+        /// <summary>
+        /// Gets a post by permalink URL
+        /// </summary>
+        /// <param name="url"></param>
+        /// <param name="limit"></param>
+        /// <returns></returns>
+        public RedditPost GetRedditPostByUrl(string url, int limit = 100)
+        {
+            var post = _reddit.GetPostAsync(new Uri(url)).GetAwaiter().GetResult();
+            return new RedditPost(post);
+        }
+
         /// <summary>
         /// Sends a private message
         /// </summary>

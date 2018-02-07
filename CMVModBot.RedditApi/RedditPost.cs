@@ -19,6 +19,7 @@ namespace CMVModBot.RedditApi
             LinkFlairCssClass = _post.LinkFlairCssClass;
             LinkFlairText = _post.LinkFlairText;
             Permalink = _post.Permalink;
+            Url = post.Url.ToString();
             SelfText = _post.SelfText;
             Title = _post.Title;
             CreatedUtc = _post.CreatedUTC;
@@ -32,6 +33,7 @@ namespace CMVModBot.RedditApi
         public string LinkFlairText { get; set; }
         public int CommentCount { get; set; }
         public Uri Permalink { get; set; }
+        public string Url { get; set; }
         public string SelfText { get; set; }
         public string Title { get; set; }
         public DateTime CreatedUtc { get; set; }
@@ -47,7 +49,7 @@ namespace CMVModBot.RedditApi
         {
             _post.StickyModeAsync(false).GetAwaiter().GetResult();
         }
-        public List<RedditComment> GetCommentsWithMore(int limit = 100, CommentThingSort sort = CommentThingSort.Best)
+        public List<RedditComment> GetCommentsWithMore(int limit = 100, CommentThingSort sort = CommentThingSort.Qa)
         {
             var comments = new List<RedditComment>();
 
@@ -56,7 +58,7 @@ namespace CMVModBot.RedditApi
 
             return comments;
         }
-        public List<RedditComment> GetComments(int limit = 100, CommentThingSort sort = CommentThingSort.Best)
+        public List<RedditComment> GetComments(int limit = 100, CommentThingSort sort = CommentThingSort.Qa)
         {
             var comments = new List<RedditComment>();
 

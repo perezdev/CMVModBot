@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.27004.2008
+VisualStudioVersion = 15.0.27130.2027
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CMVModBot.Bot", "CMVModBot.Bot\CMVModBot.Bot.csproj", "{C2423684-2250-4E1A-AA01-C38550FD6084}"
 EndProject
@@ -10,6 +10,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CMVModBot.RedditApi", "CMVModBot.RedditApi\CMVModBot.RedditApi.csproj", "{1B467CCA-EA07-4981-B68F-7519971D3325}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RedditSharp", "RedditSharp\RedditSharp.csproj", "{E2DFB52B-3320-40CF-AC59-821E8AE78DFF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CMVModBot.SnooNotes", "CMVModBot.SnooNotes\CMVModBot.SnooNotes.csproj", "{D489D90C-41FE-4255-95A3-212A7BF2C894}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{E2DFB52B-3320-40CF-AC59-821E8AE78DFF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E2DFB52B-3320-40CF-AC59-821E8AE78DFF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E2DFB52B-3320-40CF-AC59-821E8AE78DFF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D489D90C-41FE-4255-95A3-212A7BF2C894}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D489D90C-41FE-4255-95A3-212A7BF2C894}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D489D90C-41FE-4255-95A3-212A7BF2C894}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D489D90C-41FE-4255-95A3-212A7BF2C894}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

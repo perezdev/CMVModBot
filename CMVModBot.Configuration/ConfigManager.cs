@@ -29,7 +29,9 @@ namespace CMVModBot.Configuration
                 RedditApiClientId = ConfigurationManager.AppSettings["RedditApiClientId"],
                 RedditApiSecret = ConfigurationManager.AppSettings["RedditApiSecret"],
                 RedditApiRedirectUri = ConfigurationManager.AppSettings["RedditApiRedirectUri"],
-                WikiPageName = ConfigurationManager.AppSettings["WikiPageName"]
+                WikiPageName = ConfigurationManager.AppSettings["WikiPageName"],
+                SnooNotesUsername = ConfigurationManager.AppSettings["SnooNotesUsername"],
+                SnooNotesApiKey = ConfigurationManager.AppSettings["SnooNotesApiKey"],
             };
 
             _subShortcut = config.SubredditShortcut;
@@ -132,7 +134,14 @@ namespace CMVModBot.Configuration
                 Name = "Rule E Removal",
                 NumberOfTopLevelCommentsToCheck = 3,
                 TimeLimitToRemovePost = new TimeSpan(3, 0, 0),
-                RemovalMessage = GetRuleERemovalMessage()
+                RemovalMessage = GetRuleERemovalMessage(),
+                SnooNotesSettings = new SnooNotesSettings()
+                {
+                    RuleERuleName = "Rule E",
+                    PreviousRuleEViolationMessage = GetPreviousRuleEViolationRemovalMessage(),
+                    PreviousRuleEViolationMinimumComments = 2,
+                    PreviousRuleEViolationMinimumCommentLength = 100,
+                },
             };
 
             return actionConfig;
@@ -153,7 +162,7 @@ namespace CMVModBot.Configuration
                     Enabled = true,
                     Title = $"It's Fresh Topic Friday!", //When we make the actual post, this will be appending with the current date
                     Body = GetFtfStickyPostBody(),
-                    Flair = "Fresh Topic Friday"
+                    Flair = ""
                 },
                 PrivateMessageSettings = new PrivateMessageSettings()
                 {
@@ -204,7 +213,21 @@ namespace CMVModBot.Configuration
 
             return message.ToString();
         }
+        private static string GetPreviousRuleEViolationRemovalMessage()
+        {
+            var message = new StringBuilder();
+            message.AppendLine("Sorry, <username> - Your post to CMV has been removed due to a previous post of yours breaking Rule E.");
+            message.AppendLine("This is a fundamental rule, as CMV is all about having a conversation [(more info here)](https://www.reddit.com/r/changemyview/wiki/rules#wiki_rule_e).");
+            message.AppendLine();
+            message.AppendLine("If you wish to continue with your new post, you first must respond to some comments in your previous post, and then resubmit.");
+            message.AppendLine();
+            message.Append("Please message the moderators if you have any problems or special circumstances.");
+            message.AppendLine();
+            message.AppendLine();
+            message.AppendLine("*I am a bot, and this action was performed automatically.*");
 
+            return message.ToString();
+        }
         #endregion
     }
 }

@@ -1,12 +1,11 @@
 ﻿using Newtonsoft.Json;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CMVModBot.Configuration
 {
+    /// <summary>
+    /// This config is saved to the wiki. Sensitive properties are ignored so we're not saving password, API keys, etc.
+    /// </summary>
     public class Config
     {
         public bool Enabled { get; set; } = true;
@@ -22,6 +21,10 @@ namespace CMVModBot.Configuration
         [JsonIgnore]
         public string RedditApiRedirectUri { get; set; }
         public string WikiPageName { get; set; }
+        [JsonIgnore]
+        public string SnooNotesApiKey { get; set; }
+        [JsonIgnore]
+        public string SnooNotesUsername { get; set; }
 
         public List<SubActionConfigBase> SubredditActionConfigs { get; set; } = new List<SubActionConfigBase>();
     }

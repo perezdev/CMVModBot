@@ -93,6 +93,10 @@
       <Project>{1b467cca-ea07-4981-b68f-7519971d3325}</Project>
       <Name>CMVModBot.RedditApi</Name>
     </ProjectReference>
+    <ProjectReference Include="..\CMVModBot.SnooNotes\CMVModBot.SnooNotes.csproj">
+      <Project>{D489D90C-41FE-4255-95A3-212A7BF2C894}</Project>
+      <Name>CMVModBot.SnooNotes</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

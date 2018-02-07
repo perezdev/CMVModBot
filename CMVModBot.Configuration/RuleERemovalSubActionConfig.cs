@@ -9,5 +9,6 @@ namespace CMVModBot.Configuration
         public int NumberOfTopLevelCommentsToCheck { get; set; }
         public string RemovalMessage { get; set; }
         public bool ExcludeMods { get; set; }
+        public SnooNotesSettings SnooNotesSettings { get; set; }
     }
 }
