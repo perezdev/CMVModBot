@@ -76,10 +76,6 @@ namespace CMVModBot.SnooNotes
                         note.Name = rootProperties.Name;
                 }
             }
-            else
-            {
-                throw new Exception("POST was not successful. No additional information available.");
-            }
 
             client.Dispose();
 

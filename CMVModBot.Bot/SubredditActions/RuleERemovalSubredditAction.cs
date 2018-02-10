@@ -22,21 +22,23 @@ namespace CMVModBot.Bot.SubredditActions
             _redditClient = redditClient;
             _snooNotesClient = snooNotesClient;
         }
-        
+
         public override void PerformSubredditAction()
         {
             var botName = _redditClient.GetBotUserName();
             var posts = _redditClient.GetRedditPostsFromNewQueue(200).Where(x => x.UserName != botName).ToList();
             var mods = _redditClient.GetModerators();
-            
+
             var shouldExcludeMods = _actionConfig.ExcludeMods;
 
             foreach (var post in posts)
             {
+                var postTime = post.ApprovedAtUtc != null ? (DateTime)post.ApprovedAtUtc : post.CreatedUtc; //Use the approved at time when available because a post might be removed due to automod
+
                 var isMod = mods.Contains(post.UserName);
                 //1. If we shouldn't exclude mods from the rules, then we should perform action regardless if the user is a mod.
                 //2. If we should exclude mods from the rules, then we should only perform actions if the user is not a mod
-                if ((!shouldExcludeMods) || (shouldExcludeMods && !isMod ))
+                if ((!shouldExcludeMods) || (shouldExcludeMods && !isMod))
                 {
                     //-----------------Previous Rule E Violation Check-----------------
 
@@ -51,13 +53,14 @@ namespace CMVModBot.Bot.SubredditActions
                         var ruleESnooNote = snooNotes.FirstOrDefault(x => x.NoteTypeId == snooNotesRuleENoteTypeId && x.Url != post.Url);
                         //This would only be null in the case where they only had one rule e violation and we're on it
                         //The month check is because reddit archives posts after 6 months. So if the note is older than 6 months, then we're not going to hold it against them
-                        if (ruleESnooNote != null && (DateTime.UtcNow - ruleESnooNote.Timestamp).Days < 183)
+                        //The postTime and snoo note timestamp check is to make sure that the post was made after the snoo note was made. We don't want to remove posts that didn't violate the rules before the snoo note was created
+                        if (ruleESnooNote != null && (DateTime.UtcNow - ruleESnooNote.Timestamp).Days < 183 && postTime > ruleESnooNote.Timestamp)
                         {
                             bool hasOpRepliedToPreviousPost = HasOpRepliedToPreviousRuleEPost(ruleESnooNote.Url);
                             if (!hasOpRepliedToPreviousPost)
                             {
                                 post.RemovePost();
-                                SubmitComment(post, _actionConfig.SnooNotesSettings.PreviousRuleEViolationMessage);
+                                SubmitComment(post, _actionConfig.SnooNotesSettings.PreviousRuleEViolationMessage.Replace("<link>", ruleESnooNote.Url));
 
                                 continue; //Since the post gets removed when the user has already been broken the rule, we'll stop here and continue with the next post
                             }
@@ -66,7 +69,6 @@ namespace CMVModBot.Bot.SubredditActions
 
                     //-----------------Current Rule E Violation Check-----------------
 
-                    var postTime = post.ApprovedAtUtc != null ? (DateTime)post.ApprovedAtUtc : post.CreatedUtc; //Use the approved at time when available because a post might be removed due to automod
                     var nowTime = DateTime.UtcNow; //Current time
                     var hoursLapsed = (nowTime - postTime).TotalHours; //Number of hours that have passed since the post was made
                     var limit = _actionConfig.TimeLimitToRemovePost; //The number of hours that are allowed to pass before the post is removed, if there are no replies by OP
@@ -76,7 +78,9 @@ namespace CMVModBot.Bot.SubredditActions
                     if (hoursLapsed >= limit.TotalHours)
                     {
                         //QA comments sorts comments by OP response first. This is a reliable way of checking if OP responded than potentially pulling thousands of comments
-                        var comments = post.GetCommentsWithMore(10, CommentThingSort.Qa);
+                        //Typically, a post won't already have bot comments. But sometimes a bot comment will be made and then removed if the post is later approved. So we need
+                        //to exclude comments made by the bot, just in case
+                        var comments = post.GetCommentsWithMore(10, CommentThingSort.Qa).Where(x => x.AuthorName != botName).ToList();
                         if (comments.Count >= commentsToCheck)
                         {
                             var hasOpReplied = HasOpRepliedToAnswers(comments, post.UserName);
@@ -118,9 +122,16 @@ namespace CMVModBot.Bot.SubredditActions
         }
         private int GetSnooNotesRuleETypeId()
         {
-            var subreddit = _snooNotesClient.GetSnooNotesSubreddit();
-            var noteType = subreddit.Settings.NoteTypes.SingleOrDefault(x => x.DisplayName == _actionConfig.SnooNotesSettings.RuleERuleName);
-            return noteType.NoteTypeId;
+            try
+            {
+                var subreddit = _snooNotesClient.GetSnooNotesSubreddit();
+                var noteType = subreddit.Settings.NoteTypes.SingleOrDefault(x => x.DisplayName == _actionConfig.SnooNotesSettings.RuleERuleName);
+                return noteType.NoteTypeId;
+            }
+            catch (Exception ex)
+            {
+                return 0;
+            }
         }
         /// <summary>
         /// Determines if the user has previously broken the rule by snoo notes
