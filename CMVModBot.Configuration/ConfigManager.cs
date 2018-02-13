@@ -204,27 +204,25 @@ namespace CMVModBot.Configuration
         private static string GetRuleERemovalMessage()
         {
             var message = new StringBuilder();
-            message.AppendLine("Sorry, <username> - your submission has been remove for breaking rule E:");
+            message.AppendLine("Sorry, u/<username> - your submission has been removed for breaking rule E:");
             message.AppendLine();
-            message.AppendLine(">Only post if you are willing to have a conversation with those who reply to you, and are available to start doing so within 3 hours of posting. ");
+            message.AppendLine("> Only post if you are willing to have a conversation with those who reply to you, and are available to start doing so within 3 hours of posting. ");
             message.Append("If you haven't replied within this time, your post will be removed. [See the wiki for more information](http://www.reddit.com/r/changemyview/wiki/rules#wiki_rule_e).");
             message.AppendLine();
-            message.AppendLine("If you would like to appeal, please respond substantially to some of the arguments people have made, and then message the [moderators by clicking this link](http://google.com).");
+            message.AppendLine("If you would like to appeal, please respond substantially to some of the arguments people have made, and then message the [moderators by clicking this link](https://www.reddit.com/message/compose?to=%2Fr%2Fchangemyview).");
 
             return message.ToString();
         }
         private static string GetPreviousRuleEViolationRemovalMessage()
         {
             var message = new StringBuilder();
-            message.AppendLine("Sorry, <username> - Your post to CMV has been removed due to a [previous post](<link>) of yours breaking Rule E.");
-            message.AppendLine("This is a fundamental rule, as CMV is all about having a conversation [(more info here)](https://www.reddit.com/r/changemyview/wiki/rules#wiki_rule_e).");
+            message.AppendLine("Sorry, u/<username> - your post to CMV has been removed due to a [previous post](<link>) of yours breaking Rule E.");
+            message.AppendLine("This is a fundamental rule, as CMV is all about having a conversation. [See the wiki for more information](https://www.reddit.com/r/changemyview/wiki/rules#wiki_rule_e).");
             message.AppendLine();
-            message.AppendLine("If you wish to continue with your new post, you first must respond to some comments in your previous post, and then resubmit.");
+            message.AppendLine("If you wish to continue with your new post, you first must **respond to some comments in your previous post, and then resubmit.** CMVModBot will make sure a reasonable effort has been made before approving the resubmission.");
             message.AppendLine();
-            message.Append("Please [message the moderators](https://www.reddit.com/message/compose?to=%2Fr%2Fchangemyview) if you have any problems or special circumstances.");
+            message.Append("Please [message the moderators](https://www.reddit.com/message/compose?to=%2Fr%2Fchangemyview) if you have any questions or concerns.");
             message.AppendLine();
-            message.AppendLine();
-            message.AppendLine("*I am a bot, and this action was performed automatically.*");
 
             return message.ToString();
         }
