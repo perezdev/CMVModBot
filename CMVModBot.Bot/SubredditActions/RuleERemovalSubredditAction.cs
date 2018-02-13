@@ -50,7 +50,8 @@ namespace CMVModBot.Bot.SubredditActions
                         //We need to determine if OP has replied to an old post where they violated Rule E. We grab the first post here because it doesn't matter if they have or haven't
                         //replied to multiple posts. Only that they haven't replied to at least one. We're excluding notes for this post because we don't want to post a comment
                         //for a post where we've already submitted a note
-                        var ruleESnooNote = snooNotes.FirstOrDefault(x => x.NoteTypeId == snooNotesRuleENoteTypeId && x.Url != post.Url);
+                        //We order by descending so we can get the last post that violated the rule. If we didn't sort, it would give us the first post and newer posts could be let through by accident
+                        var ruleESnooNote = snooNotes.Where(x => x.NoteTypeId == snooNotesRuleENoteTypeId && x.Url != post.Url).OrderByDescending(x => x.Timestamp).FirstOrDefault();
                         //This would only be null in the case where they only had one rule e violation and we're on it
                         //The month check is because reddit archives posts after 6 months. So if the note is older than 6 months, then we're not going to hold it against them
                         //The postTime and snoo note timestamp check is to make sure that the post was made after the snoo note was made. We don't want to remove posts that didn't violate the rules before the snoo note was created
@@ -60,7 +61,7 @@ namespace CMVModBot.Bot.SubredditActions
                             if (!hasOpRepliedToPreviousPost)
                             {
                                 post.RemovePost();
-                                SubmitComment(post, _actionConfig.SnooNotesSettings.PreviousRuleEViolationMessage.Replace("<link>", ruleESnooNote.Url));
+                                SubmitComment(post, _actionConfig.SnooNotesSettings.PreviousRuleEViolationMessage.Replace("&lt;link&gt;", ruleESnooNote.Url));
 
                                 continue; //Since the post gets removed when the user has already been broken the rule, we'll stop here and continue with the next post
                             }
