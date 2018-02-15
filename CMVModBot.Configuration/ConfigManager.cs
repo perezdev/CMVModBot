@@ -217,7 +217,7 @@ namespace CMVModBot.Configuration
         private static string GetPreviousRuleEViolationRemovalMessage()
         {
             var message = new StringBuilder();
-            message.AppendLine("Sorry, u/<username> - your post to CMV has been removed due to a [previous post](<link>) of yours breaking Rule E.");
+            message.AppendLine("Sorry, u/&lt;username&gt; - your post to CMV has been removed due to a [previous post](<link>) of yours breaking Rule E.");
             message.AppendLine("This is a fundamental rule, as CMV is all about having a conversation. [See the wiki for more information](https://www.reddit.com/r/changemyview/wiki/rules#wiki_rule_e).");
             message.AppendLine();
             message.AppendLine("If you wish to continue with your new post, you first must **respond to some comments in your previous post, and then resubmit.** CMVModBot will make sure a reasonable effort has been made before approving the resubmission.");

@@ -73,9 +73,6 @@ namespace CMVModBot.RedditApi
         }
         public RedditComment SubmitModComment(string message)
         {
-            //Replace username placeholder with OP's name. The place holder allows the mods to change up the message and display OP's name however they like
-            message = message.Replace("&lt;username&gt;", _post.AuthorName); //It might be good to abstract this to a utility so it can be used in different places - 2018.1.12
-
             Comment comment = _post.CommentAsync(message).GetAwaiter().GetResult() as Comment;
             return new RedditComment(comment);
         }

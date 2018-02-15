@@ -61,7 +61,13 @@ namespace CMVModBot.Bot.SubredditActions
                             if (!hasOpRepliedToPreviousPost)
                             {
                                 post.RemovePost();
-                                SubmitComment(post, _actionConfig.SnooNotesSettings.PreviousRuleEViolationMessage.Replace("&lt;link&gt;", ruleESnooNote.Url));
+                                var alreadyRemovedRemovalMessage = _actionConfig.SnooNotesSettings.PreviousRuleEViolationMessage.Replace("&lt;link&gt;", ruleESnooNote.Url);
+                                alreadyRemovedRemovalMessage = alreadyRemovedRemovalMessage.Replace("<link>", ruleESnooNote.Url);
+                                alreadyRemovedRemovalMessage = alreadyRemovedRemovalMessage.Replace("&amp;lt;username&amp;gt;", post.UserName);
+                                alreadyRemovedRemovalMessage = alreadyRemovedRemovalMessage.Replace("<username>", post.UserName);
+                                alreadyRemovedRemovalMessage = alreadyRemovedRemovalMessage.Replace("&gt;", ">");
+
+                                SubmitComment(post, alreadyRemovedRemovalMessage);
 
                                 continue; //Since the post gets removed when the user has already been broken the rule, we'll stop here and continue with the next post
                             }
@@ -74,7 +80,9 @@ namespace CMVModBot.Bot.SubredditActions
                     var hoursLapsed = (nowTime - postTime).TotalHours; //Number of hours that have passed since the post was made
                     var limit = _actionConfig.TimeLimitToRemovePost; //The number of hours that are allowed to pass before the post is removed, if there are no replies by OP
                     var commentsToCheck = _actionConfig.NumberOfTopLevelCommentsToCheck; //We only apply the rule if at least 'n' amount of people have replied. OP shouldn't be penalized if no one has responded
-                    var removalMessage = _actionConfig.RemovalMessage;
+                    var removalMessage = _actionConfig.RemovalMessage.Replace("&amp;lt;username&amp;gt;", post.UserName);
+                    removalMessage = _actionConfig.RemovalMessage.Replace("<username>", post.UserName);
+                    removalMessage = removalMessage.Replace("&gt;", ">");
 
                     if (hoursLapsed >= limit.TotalHours)
                     {
