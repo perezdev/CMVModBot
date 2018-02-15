@@ -204,10 +204,11 @@ namespace CMVModBot.Configuration
         private static string GetRuleERemovalMessage()
         {
             var message = new StringBuilder();
-            message.AppendLine("Sorry, u/<username> - your submission has been removed for breaking rule E:");
+            message.AppendLine("Sorry, u/&lt;username&gt; - your submission has been removed for breaking rule E:");
             message.AppendLine();
             message.AppendLine("> Only post if you are willing to have a conversation with those who reply to you, and are available to start doing so within 3 hours of posting. ");
             message.Append("If you haven't replied within this time, your post will be removed. [See the wiki for more information](http://www.reddit.com/r/changemyview/wiki/rules#wiki_rule_e).");
+            message.AppendLine();
             message.AppendLine();
             message.AppendLine("If you would like to appeal, please respond substantially to some of the arguments people have made, and then message the [moderators by clicking this link](https://www.reddit.com/message/compose?to=%2Fr%2Fchangemyview).");
 

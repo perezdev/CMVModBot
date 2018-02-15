@@ -14,7 +14,28 @@ namespace CMVModBot.Bot
 
         public static void Main(string[] args)
         {
-            DoWork();
+            if (args.Length > 0)
+            {
+                bool shouldTestReddit = false;
+                bool shouldTestSnooNotes = false;
+
+                foreach (var arg in args)
+                {
+                    if (arg.ToLower() == "/TestReddit".ToLower())
+                        shouldTestSnooNotes = true;
+                    else if (arg.ToLower() == "/TestSnooNotes".ToLower())
+                        shouldTestSnooNotes = true;
+                }
+
+                if (shouldTestReddit)
+                    TestReddit();
+                if (shouldTestSnooNotes)
+                    TestSnooNotes();
+            }
+            else
+            {
+                DoWork();
+            }
         }
 
         private static void DoWork()
@@ -38,7 +59,31 @@ namespace CMVModBot.Bot
             }
             catch (Exception ex)
             {
-                string error = ex.Message;
+                Console.WriteLine(ex.Message);
+            }
+        }
+        private static void TestReddit()
+        {
+
+        }
+        private static void TestSnooNotes()
+        {
+            try
+            {
+                Console.WriteLine("Starting SnooNotes connection test...");
+
+                Console.WriteLine("Getting configuration...");
+                _config = ConfigManager.GetConfig();
+                Console.WriteLine("Creating SnooNotes client...");
+                var client = new SnooNotesClient(_config.SnooNotesUsername, _config.SnooNotesApiKey, _config.SubredditShortcut);
+                Console.WriteLine("Performing SnooNotes GET...");
+                var notes = client.GetSnooNotesSubreddit();
+                if (notes == null)
+                    Console.WriteLine("Error: SnooNotes GET returned NULL object...");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
             }
         }
     }
