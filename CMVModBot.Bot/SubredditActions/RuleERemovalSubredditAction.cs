@@ -64,6 +64,7 @@ namespace CMVModBot.Bot.SubredditActions
                                 var alreadyRemovedRemovalMessage = _actionConfig.SnooNotesSettings.PreviousRuleEViolationMessage.Replace("&lt;link&gt;", ruleESnooNote.Url);
                                 alreadyRemovedRemovalMessage = alreadyRemovedRemovalMessage.Replace("<link>", ruleESnooNote.Url);
                                 alreadyRemovedRemovalMessage = alreadyRemovedRemovalMessage.Replace("&amp;lt;username&amp;gt;", post.UserName);
+                                alreadyRemovedRemovalMessage = _actionConfig.RemovalMessage.Replace("&lt;username&gt;", post.UserName);
                                 alreadyRemovedRemovalMessage = alreadyRemovedRemovalMessage.Replace("<username>", post.UserName);
                                 alreadyRemovedRemovalMessage = alreadyRemovedRemovalMessage.Replace("&gt;", ">");
 
@@ -81,6 +82,7 @@ namespace CMVModBot.Bot.SubredditActions
                     var limit = _actionConfig.TimeLimitToRemovePost; //The number of hours that are allowed to pass before the post is removed, if there are no replies by OP
                     var commentsToCheck = _actionConfig.NumberOfTopLevelCommentsToCheck; //We only apply the rule if at least 'n' amount of people have replied. OP shouldn't be penalized if no one has responded
                     var removalMessage = _actionConfig.RemovalMessage.Replace("&amp;lt;username&amp;gt;", post.UserName);
+                    removalMessage = _actionConfig.RemovalMessage.Replace("&lt;username&gt;", post.UserName);
                     removalMessage = _actionConfig.RemovalMessage.Replace("<username>", post.UserName);
                     removalMessage = removalMessage.Replace("&gt;", ">");
 
