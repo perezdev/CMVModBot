@@ -53,9 +53,29 @@ namespace CMVModBot.RedditApi
         {
             var comments = new List<RedditComment>();
 
-            foreach(Comment comment in _post.GetCommentsWithMoresAsync(limit, GetCommentSortFromThingSort(sort)).GetAwaiter().GetResult())
-                comments.Add(new RedditComment(comment));
+            var things = _post.GetCommentsWithMoresAsync(limit, GetCommentSortFromThingSort(sort)).GetAwaiter().GetResult();
 
+            try
+            {
+                foreach (var thing in things)
+                {
+                    try
+                    {
+                        //I think we need to get rid of "more" eventually. I think I got confused on what more would return. This is a temp fix to allow the bot to continue running
+                        if (thing.GetType() == typeof(Comment))
+                            comments.Add(new RedditComment((Comment)thing));
+                    }
+                    catch (Exception ex)
+                    {
+                        //Ignore the error for now so the processing can continue   
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                //Ignore the error for now so the processing can continue
+            }
+            
             return comments;
         }
         public List<RedditComment> GetComments(int limit = 100, CommentThingSort sort = CommentThingSort.Qa)
