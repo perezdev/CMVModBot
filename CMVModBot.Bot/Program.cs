@@ -51,7 +51,9 @@ namespace CMVModBot.Bot
                     foreach (var actionConfig in _config.SubredditActionConfigs)
                     {
                         if (actionConfig.GetType() == typeof(FreshTopicFridaySubActionConfig))
-                            new FreshTopicFridaySubredditAction(actionConfig as FreshTopicFridaySubActionConfig, _reddit).PerformSubredditAction();
+                        {
+                            //new FreshTopicFridaySubredditAction(actionConfig as FreshTopicFridaySubActionConfig, _reddit).PerformSubredditAction();
+                        }
                         else if (actionConfig.GetType() == typeof(RuleERemovalSubActionConfig))
                             new RuleERemovalSubredditAction(actionConfig as RuleERemovalSubActionConfig, _reddit, _snoonotes).PerformSubredditAction();
                     }
