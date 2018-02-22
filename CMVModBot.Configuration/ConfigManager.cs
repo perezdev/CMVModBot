@@ -152,7 +152,7 @@ namespace CMVModBot.Configuration
             {
                 Enabled = true,
                 Name = "Fresh Topic Friday",
-                FlairText = "Fresh Topic Friday",
+                FlairText = "FRESH TOPIC FRIDAY",
                 StartDayOfWeek = DayOfWeek.Friday,
                 EndDayOfWeek = DayOfWeek.Saturday,
                 StartUtcTime = new TimeSpan(0, 6, 0, 0, 0),

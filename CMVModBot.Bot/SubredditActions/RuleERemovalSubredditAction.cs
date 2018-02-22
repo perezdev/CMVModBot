@@ -91,7 +91,7 @@ namespace CMVModBot.Bot.SubredditActions
                         //QA comments sorts comments by OP response first. This is a reliable way of checking if OP responded than potentially pulling thousands of comments
                         //Typically, a post won't already have bot comments. But sometimes a bot comment will be made and then removed if the post is later approved. So we need
                         //to exclude comments made by the bot, just in case
-                        var comments = post.GetCommentsWithMore(10, CommentThingSort.Qa).Where(x => x.AuthorName != botName).ToList();
+                        var comments = post.GetComments(10, CommentThingSort.Qa).Where(x => x.AuthorName != botName).ToList();
                         if (comments.Count >= commentsToCheck)
                         {
                             var hasOpReplied = HasOpRepliedToAnswers(comments, post.UserName);
