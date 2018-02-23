@@ -10,6 +10,7 @@ namespace CMVModBot.RedditApi
         public string Id { get; set; }
         public string AuthorName { get; set; }
         public string Body { get; set; }
+        public bool? IsRemoved { get; set; }
         public List<RedditComment> Comments { get; set; } = new List<RedditComment>();
 
         public RedditComment() { }
@@ -20,6 +21,7 @@ namespace CMVModBot.RedditApi
             Id = _comment.Id;
             AuthorName = _comment.AuthorName;
             Body = _comment.Body;
+            IsRemoved = _comment.IsRemoved;
             foreach (Comment c in _comment.Comments)
                 Comments.Add(new RedditComment(c));
         }
