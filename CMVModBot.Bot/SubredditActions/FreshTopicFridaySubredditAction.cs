@@ -64,7 +64,7 @@ namespace CMVModBot.Bot.SubredditActions
         /// </summary>
         private void SetSpamFiltering(SelfPostSpamFilterStrength filter)
         {
-            if (_redditClient.GetSelfPostSpamFilterStrength() != filter)
+            //if (_redditClient.GetSelfPostSpamFilterStrength() != filter)
                 _redditClient.UpdateSubredditSpamFilter(filter);
         }
         /// <summary>
@@ -87,9 +87,8 @@ namespace CMVModBot.Bot.SubredditActions
         /// </summary>
         private void PmUsersOnNewPosts()
         {
-
             //We'll grab all of the posts from the new queue that don't have a flair already. This is so we can set the flair and PM the individual.
-            var posts = _redditClient.GetRedditPostsFromNewQueue().Where(x => x.LinkFlairText != _actionConfig.StickyPostSettings.Flair).ToList();
+            var posts = _redditClient.GetRedditPostsFromNewQueue().Where(x => x.LinkFlairText != null && x.LinkFlairText.ToLower() != _actionConfig.FlairText.ToLower()).ToList();
             foreach (var post in posts)
             {
                 var postDate = post.ApprovedAtUtc != null ? (DateTime)post.ApprovedAtUtc : post.CreatedUtc; //Use the approved at time when available because a post might be removed due to automod
@@ -106,7 +105,6 @@ namespace CMVModBot.Bot.SubredditActions
                     //felt like the most readable.
 
                     bool shouldPmUser = false;
-                    bool shouldFlair = false;
                     bool isMod = _redditClient.GetModerators().Contains(post.UserName);
                     bool shouldExcludeMods = _actionConfig.PrivateMessageSettings.ExcludeMods;
 
@@ -114,14 +112,10 @@ namespace CMVModBot.Bot.SubredditActions
                     if ((!isMod) || (isMod && !shouldExcludeMods))
                         shouldPmUser = true;
 
-                    //Since we don't use a database to determine if a user has been PMed, we use the flair text instead
-                    if (post.LinkFlairText == _actionConfig.FlairText)
-                        shouldFlair = false;
-
-                    if (shouldPmUser && shouldFlair && _actionConfig.PrivateMessageSettings.Enabled)
+                    if (shouldPmUser && _actionConfig.PrivateMessageSettings.Enabled)
                     {
                         //Set the flair so we don't PM the users more than once.
-                        post.SetFlair(_actionConfig.FlairText);
+                        post.SetFlair(_actionConfig.FlairText, _actionConfig.FlairCssClass);
                         //Don't PM if the setting is disabled. But we check it all the way at the end so that
                         _redditClient.SendPrivateMessage(_actionConfig.PrivateMessageSettings.Subject, _actionConfig.PrivateMessageSettings.Message, post.UserName);
                     }

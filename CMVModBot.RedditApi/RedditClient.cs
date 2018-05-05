@@ -114,7 +114,6 @@ namespace CMVModBot.RedditApi
                         break;
                 }
 
-                settings.AllowAsDefault = true;
                 settings.UpdateSettings().GetAwaiter().GetResult();
             }
         }

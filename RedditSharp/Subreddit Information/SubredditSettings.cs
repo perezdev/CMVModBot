@@ -69,6 +69,8 @@ namespace RedditSharp
             HeaderHoverText = data["header_hover_text"].ValueOrDefault<string>();
             NSFW = data["over18"].ValueOrDefault<bool>();
             PublicDescription = WebUtility.HtmlDecode(data["public_description"].ValueOrDefault<string>() ?? string.Empty);
+            SubmissionText = WebUtility.HtmlDecode(data["submit_text"].ValueOrDefault<string>() ?? string.Empty);
+            MinutesToHideCommentScores = data["comment_score_hide_mins"].ValueOrDefault<int>();
             SpamFilter = new SpamFilterSettings
             {
                 LinkPostStrength = GetSpamFilterStrength(data["spam_links"].ValueOrDefault<string>()),
@@ -122,6 +124,31 @@ namespace RedditSharp
                         break;
                     case "self":
                         ContentOptions = ContentOptions.SelfOnly;
+                        break;
+                }
+            }
+            if (data["suggested_comment_sort"] != null)
+            {
+                var sort = data["suggested_comment_sort"].ValueOrDefault<string>();
+                switch (sort)
+                {
+                    case "confidence":
+                        SuggestedCommentSort = SuggestedCommentSort.Best;
+                        break;
+                    case "old":
+                        SuggestedCommentSort = SuggestedCommentSort.Old;
+                        break;
+                    case "top":
+                        SuggestedCommentSort = SuggestedCommentSort.Top;
+                        break;
+                    case "qa":
+                        SuggestedCommentSort = SuggestedCommentSort.QA;
+                        break;
+                    case "controversial":
+                        SuggestedCommentSort = SuggestedCommentSort.Controversial;
+                        break;
+                    case "new":
+                        SuggestedCommentSort = SuggestedCommentSort.New;
                         break;
                 }
             }
@@ -218,6 +245,18 @@ namespace RedditSharp
         public bool AllowImages { get; set; }
 
         /// <summary>
+        /// Text to show on submission page. 1024 characters max.
+        /// </summary>
+        public string SubmissionText { get; set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public SuggestedCommentSort SuggestedCommentSort { get; set; }
+
+        public int MinutesToHideCommentScores { get; set; }
+
+        /// <summary>
         /// Update the subreddit settings.
         /// </summary>
         public async Task UpdateSettings()
@@ -225,6 +264,8 @@ namespace RedditSharp
             string link_type;
             string type;
             string wikimode;
+            string comment_sort = "";
+
             switch (ContentOptions)
             {
                 case ContentOptions.All:
@@ -279,6 +320,28 @@ namespace RedditSharp
                     wikimode = "disabled";
                     break;
             }
+            switch (SuggestedCommentSort)
+            {
+                case SuggestedCommentSort.Best:
+                    comment_sort = "confidence";
+                    break;
+                case SuggestedCommentSort.Old:
+                    comment_sort = "old";
+                    break;
+                case SuggestedCommentSort.Top:
+                    comment_sort = "top";
+                    break;
+                case SuggestedCommentSort.QA:
+                    comment_sort = "qa";
+                    break;
+                case SuggestedCommentSort.Controversial:
+                    comment_sort = "controversial";
+                    break;
+                case SuggestedCommentSort.New:
+                    comment_sort = "new";
+                    break;
+            }
+
             await WebAgent.Post(SiteAdminUrl, new
             {
                 allow_top = AllowAsDefault,
@@ -290,7 +353,7 @@ namespace RedditSharp
                 over18 = NSFW,
                 public_description = PublicDescription,
                 show_media = ShowThumbnails,
-                sr = Subreddit.FullName,
+                sr = Subreddit.FullName,    
                 title = Title,
                 type,
                 wiki_edit_age = WikiEditAge,
@@ -299,6 +362,9 @@ namespace RedditSharp
                 spam_links = SpamFilter == null ? null : SpamFilter.LinkPostStrength.ToString().ToLowerInvariant(),
                 spam_selfposts = SpamFilter == null ? null : SpamFilter.SelfPostStrength.ToString().ToLowerInvariant(),
                 spam_comments = SpamFilter == null ? null : SpamFilter.CommentStrength.ToString().ToLowerInvariant(),
+                submit_text = SubmissionText,
+                suggested_comment_sort = comment_sort,
+                comment_score_hide_mins = MinutesToHideCommentScores,
                 api_type = "json"
             }, "header-title", HeaderHoverText).ConfigureAwait(false);
         }
@@ -433,5 +499,15 @@ namespace RedditSharp
         /// Filter every post initially and they will need to be approved manually to be visible.
         /// </summary>
         All
+    }
+
+    public enum SuggestedCommentSort
+    {
+        Best, //confidence
+        Old, //old
+        Top, //top
+        QA, //qa
+        Controversial, //controversial
+        New //new
     }
 }

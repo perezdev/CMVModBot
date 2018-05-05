@@ -27,10 +27,10 @@ namespace CMVModBot.Bot
                         shouldTestSnooNotes = true;
                 }
 
-                if (shouldTestReddit)
-                    TestReddit();
-                if (shouldTestSnooNotes)
-                    TestSnooNotes();
+                //if (shouldTestReddit)
+                //    TestReddit();
+                //if (shouldTestSnooNotes)
+                //    TestSnooNotes();
             }
             else
             {
@@ -42,17 +42,21 @@ namespace CMVModBot.Bot
         {
             try
             {
-                _config = ConfigManager.GetConfig(); //Config will be pulled fresh from the sub wiki on every iteration of work
-                _reddit = new RedditClient(_config.BotUsername, _config.BotPassword, _config.RedditApiClientId, _config.RedditApiSecret, _config.RedditApiRedirectUri, _config.SubredditShortcut);
+                var credentials = ConfigManager.GetBotCredentials();
+                _reddit = new RedditClient(credentials.Username, credentials.Password, credentials.ClientId, credentials.ApiSecret, credentials.RedirectUri, credentials.SubredditShortcut);
+                _config = ConfigManager.GetConfig(_reddit); //Config will be pulled fresh from the sub wiki on every iteration of work
+                
                 _snoonotes = new SnooNotesClient(_config.SnooNotesUsername, _config.SnooNotesApiKey, _config.SubredditShortcut);
 
                 if (_config.Enabled)
                 {
                     foreach (var actionConfig in _config.SubredditActionConfigs)
                     {
-                        if (actionConfig.GetType() == typeof(FreshTopicFridaySubActionConfig))
+                        Console.WriteLine($"{actionConfig.Name} - {actionConfig.Enabled}");
+
+                        if (actionConfig.GetType() == typeof(FreshTopicFridaySubActionConfig) && actionConfig.Enabled)
                             new FreshTopicFridaySubredditAction(actionConfig as FreshTopicFridaySubActionConfig, _reddit).PerformSubredditAction();
-                        else if (actionConfig.GetType() == typeof(RuleERemovalSubActionConfig))
+                        else if (actionConfig.GetType() == typeof(RuleERemovalSubActionConfig) && actionConfig.Enabled)
                             new RuleERemovalSubredditAction(actionConfig as RuleERemovalSubActionConfig, _reddit, _snoonotes).PerformSubredditAction();
                     }
                 }
@@ -62,29 +66,29 @@ namespace CMVModBot.Bot
                 Console.WriteLine(ex.Message);
             }
         }
-        private static void TestReddit()
-        {
+        //private static void TestReddit()
+        //{
 
-        }
-        private static void TestSnooNotes()
-        {
-            try
-            {
-                Console.WriteLine("Starting SnooNotes connection test...");
+        //}
+        //private static void TestSnooNotes()
+        //{
+        //    try
+        //    {
+        //        Console.WriteLine("Starting SnooNotes connection test...");
 
-                Console.WriteLine("Getting configuration...");
-                _config = ConfigManager.GetConfig();
-                Console.WriteLine("Creating SnooNotes client...");
-                var client = new SnooNotesClient(_config.SnooNotesUsername, _config.SnooNotesApiKey, _config.SubredditShortcut);
-                Console.WriteLine("Performing SnooNotes GET...");
-                var notes = client.GetSnooNotesSubreddit();
-                if (notes == null)
-                    Console.WriteLine("Error: SnooNotes GET returned NULL object...");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
-        }
+        //        Console.WriteLine("Getting configuration...");
+        //        _config = ConfigManager.GetConfig();
+        //        Console.WriteLine("Creating SnooNotes client...");
+        //        var client = new SnooNotesClient(_config.SnooNotesUsername, _config.SnooNotesApiKey, _config.SubredditShortcut);
+        //        Console.WriteLine("Performing SnooNotes GET...");
+        //        var notes = client.GetSnooNotesSubreddit();
+        //        if (notes == null)
+        //            Console.WriteLine("Error: SnooNotes GET returned NULL object...");
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Console.WriteLine(ex.Message);
+        //    }
+        //}
     }
 }

@@ -26,7 +26,7 @@ namespace CMVModBot.Bot.SubredditActions
         public override void PerformSubredditAction()
         {
             var botName = _redditClient.GetBotUserName();
-            var posts = _redditClient.GetRedditPostsFromNewQueue(200).Where(x => x.UserName != botName).ToList();
+            var posts = _redditClient.GetRedditPostsFromNewQueue(100).Where(x => x.UserName != botName).ToList();
             var mods = _redditClient.GetModerators();
 
             var shouldExcludeMods = _actionConfig.ExcludeMods;

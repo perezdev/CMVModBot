@@ -14,13 +14,16 @@ namespace CMVModBot.Configuration
         //This is so we can use the sub shortcut while building the config. Otherwise, we'd have to wait until the config was completed. Which won't work,
         //because some things require the sub shortcut like the PM info. This feels a bit hacky. But I'll address it later, if needed.
         private static string _subShortcut { get; set; }
+        private static RedditClient _redditClient { get; set; }
 
         /// <summary>
         /// Gets the config object from the app.config file (for sensitive data) and the specified Wiki page
         /// </summary>
         /// <returns></returns>
-        public static Config GetConfig()
+        public static Config GetConfig(RedditClient redditClient)
         {
+            _redditClient = redditClient;
+
             var config = new Config()
             {
                 SubredditShortcut = ConfigurationManager.AppSettings["SubredditShortcut"],
@@ -36,10 +39,8 @@ namespace CMVModBot.Configuration
 
             _subShortcut = config.SubredditShortcut;
 
-            //Instantiating the reddit client logs the bot into reddit. Every reddit api action will be called from the reddit client
-            var redditClient = new RedditClient(config.BotUsername, config.BotPassword, config.RedditApiClientId, config.RedditApiSecret, config.RedditApiRedirectUri, config.SubredditShortcut);
             //The wiki page stores the confguration as JSON. If the JSON is empty, we'll build the config from default values
-            var configJson = redditClient.GetWikiPageText(config.WikiPageName);
+            var configJson = _redditClient.GetWikiPageText(config.WikiPageName);
             //The sensitive config values like the bot password and API secret come from the app.config. Everything else is stored on
             //the wiki page so it can be updated when needed.
             var wikiConfig = DeserializeJson(configJson);
@@ -53,6 +54,18 @@ namespace CMVModBot.Configuration
                 SaveConfig(config);
 
             return config;
+        }
+        public static BotCredentials GetBotCredentials()
+        {
+            return new BotCredentials()
+            {
+                Username = ConfigurationManager.AppSettings["BotUsername"],
+                Password = ConfigurationManager.AppSettings["BotPassword"],
+                ApiSecret = ConfigurationManager.AppSettings["RedditApiSecret"],
+                ClientId = ConfigurationManager.AppSettings["RedditApiClientId"],
+                RedirectUri = ConfigurationManager.AppSettings["RedditApiRedirectUri"],
+                SubredditShortcut = ConfigurationManager.AppSettings["SubredditShortcut"],
+            };
         }
         /// <summary>
         /// Gets the enabled configurations for the subreddit actions from the wiki config
@@ -94,9 +107,7 @@ namespace CMVModBot.Configuration
         public static void SaveConfig(Config config)
         {
             string configJson = SerializeJson(config); //Convert config object to JSON string
-
-            var redditClient = new RedditClient(config.BotUsername, config.BotPassword, config.RedditApiClientId, config.RedditApiSecret, config.RedditApiSecret, config.SubredditShortcut);
-            redditClient.SaveWikiPageText(config.WikiPageName, configJson);
+            _redditClient.SaveWikiPageText(config.WikiPageName, configJson);
         }
         /// <summary>
         /// Converts config object to a JSON string

@@ -41,9 +41,9 @@ namespace CMVModBot.RedditApi
         public string UserName { get; set; }
         public bool IsMod { get; set; }
 
-        public void SetFlair(string flair)
+        public void SetFlair(string flair, string cssClass)
         {
-            _post.SetFlairAsync(flair, "").GetAwaiter().GetResult();
+            _post.SetFlairAsync(flair, cssClass).GetAwaiter().GetResult();
         }
         public void UnstickyPost()
         {
