@@ -146,6 +146,7 @@ namespace CMVModBot.Configuration
                 NumberOfTopLevelCommentsToCheck = 3,
                 TimeLimitToRemovePost = new TimeSpan(3, 0, 0),
                 RemovalMessage = GetRuleERemovalMessage(),
+                ExcludeMods = true,
                 SnooNotesSettings = new SnooNotesSettings()
                 {
                     RuleERuleName = "Rule E",
